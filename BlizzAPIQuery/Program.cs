@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace BlizzAPIQuery
 {
+
+	// Data Classes for JSON conversion
 	public class Realm
 	{
 		public string type { get; set; }
@@ -22,7 +24,6 @@ namespace BlizzAPIQuery
 		public string timezone { get; set; }
 		public List<string> connected_realms { get; set; }
 	}
-
 	public class RealmList
 	{
 		public List<Realm> realms { get; set; }
@@ -39,8 +40,11 @@ namespace BlizzAPIQuery
 				String userInput = Console.ReadLine();
 				Console.Write(userInput);
 			}*/
+
+
 			RunAsync().Wait();
 		}
+
 
 		static async Task RunAsync()
 		{
@@ -48,7 +52,14 @@ namespace BlizzAPIQuery
 			client.DefaultRequestHeaders.Accept.Clear();
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-			RealmList test = await GetRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+			try
+			{
+				RealmList realms = await GetRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine("Could not connect to the Blizz API to update realm status!");
+			}
 
 			Console.ReadLine();
 		}
@@ -65,7 +76,6 @@ namespace BlizzAPIQuery
 
 
 			JObject realmData = JObject.Parse(responseData);
-
 			realms = JsonConvert.DeserializeObject<RealmList>(responseData);
 
 			return realms;

@@ -1,0 +1,10 @@
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.exe.config
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.exe
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.pdb
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.csprojResolveAssemblyReference.cache
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.exe
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.pdb
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\Newtonsoft.Json.dll
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\System.Net.Http.Formatting.dll
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\Newtonsoft.Json.xml
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\System.Net.Http.Formatting.xml

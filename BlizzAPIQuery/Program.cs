@@ -105,7 +105,18 @@ namespace BlizzAPIQuery
 
 			Realm[] realmArray = list.realms.ToArray();
 
-			
+
+
+			// Delete all entries in tables so no duplicates.
+			using (SqlConnection connection = new SqlConnection(connectionString))
+			{
+				SqlCommand command = new SqlCommand("DELETE FROM RealmList;", connection);
+				command.Connection.Open();
+				command.ExecuteNonQuery();
+				command = new SqlCommand("DELETE FROM ConnectedRealms;", connection);
+				command.ExecuteNonQuery();
+				command.Connection.Close();
+			}
 
 			for (int i = 0; i < realmArray.Length; i++)
 			{
@@ -116,7 +127,7 @@ namespace BlizzAPIQuery
 				if (crArray.Length == 1)
 					using (SqlConnection connection = new SqlConnection(connectionString))
 					{
-						SqlCommand command = new SqlCommand("INSERT INTO ConnectedRealms (RealmName) VALUES ('" + realmArray[i].slug +"');", connection);
+						SqlCommand command = new SqlCommand("INSERT INTO ConnectedRealms (RealmName) VALUES ('" + realmArray[i].slug + "');", connection);
 						command.Connection.Open();
 						command.ExecuteNonQuery();
 						command.Connection.Close();
@@ -141,9 +152,9 @@ namespace BlizzAPIQuery
 							int connectID = (int)command.ExecuteScalar();
 
 							for (int j = 0; j < crArray.Length; j++)
-								if(!crArray[j].Equals(realmArray[i].slug))
+								if (!crArray[j].Equals(realmArray[i].slug))
 								{
-									command = new SqlCommand("INSERT INTO ConnectedRealms (ConnectID, RealmName) VALUES (" + connectID +", '" + crArray[j] + "');", connection);
+									command = new SqlCommand("INSERT INTO ConnectedRealms (ConnectID, RealmName) VALUES (" + connectID + ", '" + crArray[j] + "');", connection);
 									command.ExecuteNonQuery();
 								}
 
@@ -161,10 +172,9 @@ namespace BlizzAPIQuery
 					int connectID = (int)command.ExecuteScalar();
 					int realmQueue = realmArray[i].queue ? 1 : 0;
 					int realmStatus = realmArray[i].status ? 1 : 0;
-					String realmName = realmArray[i].name;
+					String realmName = realmArray[i].name.Contains("'") ? realmArray[i].name.Insert(realmArray[i].name.LastIndexOf("'"), "'") : realmArray[i].name;
 
-					if (realmName.Contains("'"));
-						realmName = realmName.
+				
 
 					command = new SqlCommand("INSERT INTO RealmList (RealmType, RealmPop, RealmQueue, RealmStatus,"+ 
 						" RealmName, RealmSlug, Battlegroup, locale, timezone, ConnectID) VALUES('" + realmArray[i].type +

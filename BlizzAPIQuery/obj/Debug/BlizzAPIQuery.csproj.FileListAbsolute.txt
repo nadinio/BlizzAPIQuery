@@ -5,9 +5,7 @@ D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.
 D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.exe
 D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.pdb
 D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\Newtonsoft.Json.dll
-D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\System.Net.Http.Formatting.dll
 D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\Newtonsoft.Json.xml
-D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\System.Net.Http.Formatting.xml
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.exe.config
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.exe
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\BlizzAPIQuery.pdb

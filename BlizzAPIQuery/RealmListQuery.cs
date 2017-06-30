@@ -54,7 +54,7 @@ namespace BlizzAPIQuery
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not connect to the Blizz API to update realm status!\n" + e.StackTrace);
+				Console.WriteLine("Could not connect to the Blizz API to update realm status!\n" + e.Message + "\n" + e.StackTrace);
 			}
 
 			try
@@ -64,7 +64,7 @@ namespace BlizzAPIQuery
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not insert realms into DB!\n" + e.StackTrace);
+				Console.WriteLine("Could not insert realms into DB!\n" + e.Message + "\n" + e.StackTrace);
 			}
 		}
 

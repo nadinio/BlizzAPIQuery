@@ -29,17 +29,17 @@ namespace BlizzAPIQuery
 		public List<Realm> realms { get; set; }
 	}
 
-	class APIQuery
+	class RealmListQuery
 	{
 		static HttpClient client = new HttpClient();
 
 		public void updateRealmList()
 		{
-			RunAsync().Wait();
+			getRealmsAndInsert().Wait();
 		}
 
-
-		static async Task RunAsync()
+		// Gets data from API and pushes into database
+		static async Task getRealmsAndInsert()
 		{
 			client.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			client.DefaultRequestHeaders.Accept.Clear();
@@ -49,15 +49,13 @@ namespace BlizzAPIQuery
 
 			try
 			{
-				realms = await GetRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+				realms = await GetAPIRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
 				Console.WriteLine("I've got the realm statuses!");
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Could not connect to the Blizz API to update realm status!\n" + e.StackTrace);
-
 			}
-
 
 			try
 			{
@@ -68,12 +66,10 @@ namespace BlizzAPIQuery
 			{
 				Console.WriteLine("Could not insert realms into DB!\n" + e.StackTrace);
 			}
-
-			Console.ReadLine();
 		}
 
-
-		static async Task<RealmList> GetRealmsAsync(String path)
+		// Pulls the data from the API
+		static async Task<RealmList> GetAPIRealmsAsync(String path)
 		{
 			RealmList realms = null;
 			HttpResponseMessage response = await client.GetAsync(path);
@@ -83,20 +79,19 @@ namespace BlizzAPIQuery
 			if (response.IsSuccessStatusCode)
 				responseData = await response.Content.ReadAsStringAsync();
 
-
 			JObject realmData = JObject.Parse(responseData);
 			realms = JsonConvert.DeserializeObject<RealmList>(responseData);
 
 			return realms;
 		}
 
+		// Inserts data into database
 		static void InsertRealms(RealmList list)
 		{
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;";
 
 			Realm[] realmArray = list.realms.ToArray();
-
 
 
 			// Delete all entries in tables so no duplicates.
@@ -124,7 +119,7 @@ namespace BlizzAPIQuery
 						command.ExecuteNonQuery();
 						command.Connection.Close();
 					}
-				else // else build a connect ID for all connected realms	
+				else // else insert all realms with same connectID if linked	
 					using (SqlConnection connection = new SqlConnection(connectionString))
 					{
 						SqlCommand command = new SqlCommand("SELECT ConnectID FROM ConnectedRealms WHERE RealmName = '" + realmArray[i].slug + "';", connection);
@@ -156,7 +151,7 @@ namespace BlizzAPIQuery
 						}
 					}
 
-				// Finally, insert realm data using the connectIDs
+				// Finally, insert realm data with connectIDs generated earlier
 				using (SqlConnection connection = new SqlConnection(connectionString))
 				{
 					SqlCommand command = new SqlCommand("SELECT ConnectID FROM ConnectedRealms WHERE RealmName = '" + realmArray[i].slug + "';", connection);
@@ -165,8 +160,6 @@ namespace BlizzAPIQuery
 					int realmQueue = realmArray[i].queue ? 1 : 0;
 					int realmStatus = realmArray[i].status ? 1 : 0;
 					String realmName = realmArray[i].name.Contains("'") ? realmArray[i].name.Insert(realmArray[i].name.LastIndexOf("'"), "'") : realmArray[i].name;
-
-
 
 					command = new SqlCommand("INSERT INTO RealmList (RealmType, RealmPop, RealmQueue, RealmStatus," +
 						" RealmName, RealmSlug, Battlegroup, locale, timezone, ConnectID) VALUES('" + realmArray[i].type +

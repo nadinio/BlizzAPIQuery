@@ -1,22 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-
+﻿using System;
 
 namespace BlizzAPIQuery
 {
-
-
-
 	class Program
 	{
-		
-
 		static void Main(string[] args)
 		{
 			/*while (true)
@@ -25,10 +12,10 @@ namespace BlizzAPIQuery
 				Console.Write(userInput);
 			}*/
 
-			APIQuery realmList = new APIQuery();
+			RealmListQuery realmList = new RealmListQuery();
 			realmList.updateRealmList();
 
-			
+			Console.ReadLine();
 		}	
 	}
 }

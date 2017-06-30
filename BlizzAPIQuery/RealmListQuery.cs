@@ -47,6 +47,7 @@ namespace BlizzAPIQuery
 
 			RealmList realms = null;
 
+			// API Call
 			try
 			{
 				realms = await GetAPIRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
@@ -57,6 +58,7 @@ namespace BlizzAPIQuery
 				Console.WriteLine("Could not connect to the Blizz API to update realm status!\n" + e.Message + "\n" + e.StackTrace);
 			}
 
+			// Database Insert
 			try
 			{
 				InsertRealms(realms);

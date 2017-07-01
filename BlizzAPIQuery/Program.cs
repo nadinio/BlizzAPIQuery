@@ -12,8 +12,14 @@ namespace BlizzAPIQuery
 				Console.Write(userInput);
 			}*/
 
+			/*
 			RealmListQuery realmList = new RealmListQuery();
 			realmList.updateRealmList();
+			*/
+
+			AuctionHouseQuery ahData = new AuctionHouseQuery();
+			ahData.updateAHData();
+
 
 			Console.ReadLine();
 		}	

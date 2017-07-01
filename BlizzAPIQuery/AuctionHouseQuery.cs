@@ -36,16 +36,16 @@ namespace BlizzAPIQuery
 
 	public class Auction
 	{
-		public int auc { get; set; }
-		public int item { get; set; }
+		public long auc { get; set; }
+		public long item { get; set; }
 		public string owner { get; set; }
 		public string ownerRealm { get; set; }
-		public int bid { get; set; }
-		public int buyout { get; set; }
+		public long bid { get; set; }
+		public long buyout { get; set; }
 		public int quantity { get; set; }
 		public string timeLeft { get; set; }
 		public int rand { get; set; }
-		public int seed { get; set; }
+		public long seed { get; set; }
 		public int context { get; set; }
 		public List<Modifier> modifiers { get; set; }
 		public int? petSpeciesId { get; set; }
@@ -62,7 +62,8 @@ namespace BlizzAPIQuery
 
 	class AuctionHouseQuery
 	{
-		static HttpClient client = new HttpClient();
+		static HttpClient ahFileClient = new HttpClient();
+		static HttpClient ahDataClient = new HttpClient();
 
 		public void updateAHData()
 		{
@@ -75,18 +76,25 @@ namespace BlizzAPIQuery
 			// I want to be able to handle one realm properly before
 			// sifting through hundreds and figuring out what went wrong.
 
-			client.BaseAddress = new Uri("https://us.api.battle.net/wow/");
-			client.DefaultRequestHeaders.Accept.Clear();
-			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
+			ahFileClient.DefaultRequestHeaders.Accept.Clear();
+			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-			AHFileRoot ahRoot = null;
-			AHRootObject
+			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
+			ahDataClient.DefaultRequestHeaders.Accept.Clear();
+			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+			AHFileRoot ahFileRoot = null;
+			AHRootObject ahRootData = null;
 			
 
 			try
 			{
 				Console.WriteLine("I'm attempting to get all the AH data. This could take a while...");
-				ahRoot = await getAPIAHRootData("auction/data/executus?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+				ahFileRoot = await getAPIAHRootFileData("auction/data/stormrage?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+
+				String ahRootDataPath = (ahFileRoot.files[0].url).Substring(55);
+				ahRootData = await getAPIAHRootData(ahRootDataPath);
 				Console.WriteLine("I've got the AH data!");
 			}
 			catch(Exception e)
@@ -96,10 +104,10 @@ namespace BlizzAPIQuery
 
 		}
 
-		static async Task<AHFileRoot> getAPIAHRootData(String path)
+		static async Task<AHFileRoot> getAPIAHRootFileData(String path)
 		{
-			AHFileRoot ahRoot = null;
-			HttpResponseMessage response = await client.GetAsync(path);
+			AHFileRoot ahFileRoot = null;
+			HttpResponseMessage response = await ahFileClient.GetAsync(path);
 
 			String responseData = "";
 
@@ -107,10 +115,25 @@ namespace BlizzAPIQuery
 				responseData = await response.Content.ReadAsStringAsync();
 
 			JObject ahRootData = JObject.Parse(responseData);
-			ahRoot = JsonConvert.DeserializeObject<AHFileRoot>(responseData);
+			ahFileRoot = JsonConvert.DeserializeObject<AHFileRoot>(responseData);
 
-			return ahRoot;
+			return ahFileRoot;
 
+		}
+		
+		static async Task<AHRootObject> getAPIAHRootData(String path)
+		{
+			AHRootObject ahRootObject = null;
+			HttpResponseMessage response = await ahDataClient.GetAsync(path);
+			String responseData = "";
+
+			if (response.IsSuccessStatusCode)
+				responseData = await response.Content.ReadAsStringAsync();
+
+			JObject realmData = JObject.Parse(responseData);
+			ahRootObject = JsonConvert.DeserializeObject<AHRootObject>(responseData);
+
+			return ahRootObject;
 		}
 
 	}

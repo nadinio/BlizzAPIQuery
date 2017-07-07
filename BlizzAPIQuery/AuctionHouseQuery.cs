@@ -81,10 +81,12 @@ namespace BlizzAPIQuery
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			ahFileClient.Timeout = TimeSpan.FromMinutes(2);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			ahDataClient.Timeout = TimeSpan.FromMinutes(2);
 
 			AHFileRoot ahFileRoot = null;
 			
@@ -122,49 +124,21 @@ namespace BlizzAPIQuery
 				Thread[] ahThreadArray = new Thread[realmCount];
 				List<Thread> startedThreads = new List<Thread>();
 
-				for(int i = 0; i < (realmCount / 3); i++)
+				for (int i = 0; i < realmCount; i++)
 				{
 					int x = i;
 					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
 					ahThreadArray[i].Start();
 					startedThreads.Add(ahThreadArray[i]);
-				
+					ahThreadArray[i].Join();
 				}
 
-				Thread.Sleep(60000);
-
-				for (int i = (realmCount / 3); i < (2 * (realmCount / 3)); i++)
-				{
-					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
-				
-				}
-
-				Thread.Sleep(60000);
-
-				for (int i = (2 * (realmCount / 3)); i < realmCount; i++)
-				{			
-					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
-				}
 
 				foreach (Thread thread in startedThreads)
 					thread.Join();
 
 
-				/*for (int i = 0; i < realmCount; i++)
-				{
-					ahFileRoot = await getAPIAHRootFileData("auction/data/" + realms[i] + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
-					String ahRootDataPath = (ahFileRoot.files[0].url).Substring(55);
-					allAHData[i] = await getAPIAHRootData(ahRootDataPath);
-				}
-				*/
-
-				Thread.Sleep(120000);
+				Thread.Sleep(75000);
 
 				Console.WriteLine(DateTime.Now + " I've got the AH data!");
 			}

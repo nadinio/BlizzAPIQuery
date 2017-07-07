@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Data.SqlClient;
 using System.Threading;
+using System.Linq;
 
 namespace BlizzAPIQuery
 {
@@ -72,21 +73,21 @@ namespace BlizzAPIQuery
 
 		public void updateAHData()
 		{
-			getAHRealmData().Wait();
+			getAHRealmData();
 		}
 
-		static async Task getAHRealmData()
+		static void getAHRealmData()
 		{
 			// HTTP Clients for data collection
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(2);
+			ahFileClient.Timeout = TimeSpan.FromMinutes(3);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahDataClient.Timeout = TimeSpan.FromMinutes(2);
+			ahDataClient.Timeout = TimeSpan.FromMinutes(3);
 
 			AHFileRoot ahFileRoot = null;
 			
@@ -121,24 +122,15 @@ namespace BlizzAPIQuery
 			{
 				Console.WriteLine(DateTime.Now + " I'm attempting to get all the AH data. This could take a while...");
 
-				Thread[] ahThreadArray = new Thread[realmCount];
-				List<Thread> startedThreads = new List<Thread>();
+				Task[] ahTaskArray = new Task[realmCount];
 
-				for (int i = 0; i < realmCount; i++)
+				for(int i = 0; i < realmCount; i++)
 				{
 					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
-					ahThreadArray[i].Join();
+					ahTaskArray[i] = Task.Run(async () => await getAHDataThread(x, realms[x]));
 				}
 
-
-				foreach (Thread thread in startedThreads)
-					thread.Join();
-
-
-				Thread.Sleep(75000);
+				Task.WaitAll(ahTaskArray);
 
 				Console.WriteLine(DateTime.Now + " I've got the AH data!");
 			}

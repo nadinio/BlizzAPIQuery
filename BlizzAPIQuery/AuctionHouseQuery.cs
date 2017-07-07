@@ -11,34 +11,33 @@ using System.Threading;
 namespace BlizzAPIQuery
 {
 
-
 	// Class definition for the root AH query
-	public class AHFile
+	class AHFile
 	{
 		public string url { get; set; }
 		public long lastModified { get; set; }
 	}
 
-	public class AHFileRoot
+	class AHFileRoot
 	{
 		public List<AHFile> files { get; set; }
 	}
 
 	// Class definition for the AH data
 
-	public class AHRealm
+	class AHRealm
 	{
 		public string name { get; set; }
 		public string slug { get; set; }
 	}
 
-	public class Modifier
+	class Modifier
 	{
 		public int type { get; set; }
 		public int value { get; set; }
 	}
 
-	public class Auction
+	class Auction
 	{
 		public long auc { get; set; }
 		public long item { get; set; }
@@ -58,7 +57,7 @@ namespace BlizzAPIQuery
 		public int? petQualityId { get; set; }
 	}
 
-	public class AHRootObject
+	class AHRootObject
 	{
 		public List<AHRealm> realms { get; set; }
 		public List<Auction> auctions { get; set; }
@@ -77,10 +76,7 @@ namespace BlizzAPIQuery
 
 		static async Task getAHRealmData()
 		{
-			// For the time being this will just pull one realm's AH data
-			// I want to be able to handle one realm properly before
-			// sifting through hundreds and figuring out what went wrong.
-
+			// HTTP Clients for data collection
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -92,13 +88,13 @@ namespace BlizzAPIQuery
 			AHFileRoot ahFileRoot = null;
 			AHRootObject[] allAHData = null;
 
-			// Get list of all connected realm hubs thingy
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;";
 
 			String[] realms;
 			int realmCount;
 
+			// Build the realm list needed. Only 1 realm needed for connected realms
 			using (SqlConnection connection = new SqlConnection(connectionString))
 			{
 				SqlCommand command = new SqlCommand("SELECT COUNT(DISTINCT ConnectID) FROM ConnectedRealms", connection);
@@ -117,6 +113,7 @@ namespace BlizzAPIQuery
 			
 			allAHData = new AHRootObject[realmCount];
 
+			// Get all the AH data
 			try
 			{
 				Console.WriteLine(DateTime.Now + " I'm attempting to get all the AH data. This could take a while...");
@@ -138,7 +135,7 @@ namespace BlizzAPIQuery
 		}
 
 
-		public static async Task<AHFileRoot> getAPIAHRootFileData(String path)
+		static async Task<AHFileRoot> getAPIAHRootFileData(String path)
 		{
 			AHFileRoot ahFileRoot = null;
 			HttpResponseMessage response = await ahFileClient.GetAsync(path);
@@ -155,7 +152,7 @@ namespace BlizzAPIQuery
 
 		}
 		
-		public static async Task<AHRootObject> getAPIAHRootData(String path)
+		static async Task<AHRootObject> getAPIAHRootData(String path)
 		{
 			AHRootObject ahRootObject = null;
 			HttpResponseMessage response = await ahDataClient.GetAsync(path);

@@ -68,6 +68,7 @@ namespace BlizzAPIQuery
 	{
 		static HttpClient ahFileClient = new HttpClient();
 		static HttpClient ahDataClient = new HttpClient();
+		static AHRootObject[] allAHData = null;
 
 		public void updateAHData()
 		{
@@ -86,7 +87,7 @@ namespace BlizzAPIQuery
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 			AHFileRoot ahFileRoot = null;
-			AHRootObject[] allAHData = null;
+			
 
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;";
@@ -118,13 +119,51 @@ namespace BlizzAPIQuery
 			{
 				Console.WriteLine(DateTime.Now + " I'm attempting to get all the AH data. This could take a while...");
 
-				for (int i = 0; i < realmCount; i++)
+				Thread[] ahThreadArray = new Thread[realmCount];
+				List<Thread> startedThreads = new List<Thread>();
+
+				for(int i = 0; i < (realmCount / 3); i++)
+				{
+					int x = i;
+					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+					ahThreadArray[i].Start();
+					startedThreads.Add(ahThreadArray[i]);
+				}
+
+				Thread.Sleep(30000);
+
+				for (int i = (realmCount / 3); i < (2 * (realmCount / 3)); i++)
+				{
+					int x = i;
+					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+					ahThreadArray[i].Start();
+					startedThreads.Add(ahThreadArray[i]);
+				}
+
+				Thread.Sleep(30000);
+
+				for (int i = (2 * (realmCount / 3)); i < realmCount; i++)
+				{
+					int x = i;
+					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+					ahThreadArray[i].Start();
+					startedThreads.Add(ahThreadArray[i]);
+				}
+
+				foreach (Thread thread in startedThreads)
+					thread.Join();
+
+
+				/*for (int i = 0; i < realmCount; i++)
 				{
 					ahFileRoot = await getAPIAHRootFileData("auction/data/" + realms[i] + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
 					String ahRootDataPath = (ahFileRoot.files[0].url).Substring(55);
 					allAHData[i] = await getAPIAHRootData(ahRootDataPath);
 				}
-				
+				*/
+
+				Thread.Sleep(120000);
+
 				Console.WriteLine(DateTime.Now + " I've got the AH data!");
 			}
 			catch (Exception e)
@@ -132,6 +171,14 @@ namespace BlizzAPIQuery
 				Console.WriteLine("Could not connect to the Blizz API to update AH data!\n" + e.Message + "\n" + e.StackTrace);
 			}
 
+		}
+
+
+		static async Task getAHDataThread(int index, String realm)
+		{
+			AHFileRoot fileRoot = await getAPIAHRootFileData("auction/data/" + realm + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+			String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
+			allAHData[index] = await getAPIAHRootData(ahRootDataPath);
 		}
 
 

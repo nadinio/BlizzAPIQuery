@@ -18,7 +18,6 @@ namespace BlizzAPIQuery
 		public string url { get; set; }
 		public long lastModified { get; set; }
 	}
-
 	class AHFileRoot
 	{
 		public List<AHFile> files { get; set; }
@@ -36,6 +35,11 @@ namespace BlizzAPIQuery
 	{
 		public int type { get; set; }
 		public int value { get; set; }
+	}
+
+	public class BonusList
+	{
+		public int bonusListId { get; set; }
 	}
 
 	class Auction
@@ -56,6 +60,7 @@ namespace BlizzAPIQuery
 		public int? petBreedId { get; set; }
 		public int? petLevel { get; set; }
 		public int? petQualityId { get; set; }
+		public List<BonusList> bonusLists { get; set; }
 	}
 
 	class AHRootObject
@@ -82,16 +87,13 @@ namespace BlizzAPIQuery
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(3);
+			ahFileClient.Timeout = TimeSpan.FromMinutes(5);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahDataClient.Timeout = TimeSpan.FromMinutes(3);
-
-			AHFileRoot ahFileRoot = null;
+			ahDataClient.Timeout = TimeSpan.FromMinutes(5);
 			
-
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;";
 

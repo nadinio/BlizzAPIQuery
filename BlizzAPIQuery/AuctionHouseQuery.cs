@@ -124,30 +124,49 @@ namespace BlizzAPIQuery
 
 				for(int i = 0; i < (realmCount / 3); i++)
 				{
-					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
+					try
+					{
+						int x = i;
+						ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+						ahThreadArray[i].Start();
+						startedThreads.Add(ahThreadArray[i]);
+					}catch(Exception e)
+					{
+						Console.WriteLine(DateTime.Now + " It looks like there was an error updating the realm " + realms[i] + ". It will attempt to update on the next data collection attempt.");
+					}
 				}
 
 				Thread.Sleep(30000);
 
 				for (int i = (realmCount / 3); i < (2 * (realmCount / 3)); i++)
 				{
-					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
+					try
+					{
+						int x = i;
+						ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+						ahThreadArray[i].Start();
+						startedThreads.Add(ahThreadArray[i]);
+					}catch(Exception)
+					{
+						Console.WriteLine(DateTime.Now + " It looks like there was an error updating the realm " + realms[i] + ". It will attempt to update on the next data collection attempt.");
+					}
 				}
 
 				Thread.Sleep(30000);
 
 				for (int i = (2 * (realmCount / 3)); i < realmCount; i++)
 				{
-					int x = i;
-					ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
-					ahThreadArray[i].Start();
-					startedThreads.Add(ahThreadArray[i]);
+					try
+					{
+						int x = i;
+						ahThreadArray[i] = new Thread(async () => await getAHDataThread(x, realms[x]));
+						ahThreadArray[i].Start();
+						startedThreads.Add(ahThreadArray[i]);
+					}
+					catch (Exception)
+					{
+						Console.WriteLine(DateTime.Now + " It looks like there was an error updating the realm " + realms[i] + ". It will attempt to update on the next data collection attempt.");
+					}
 				}
 
 				foreach (Thread thread in startedThreads)
@@ -176,9 +195,15 @@ namespace BlizzAPIQuery
 
 		static async Task getAHDataThread(int index, String realm)
 		{
-			AHFileRoot fileRoot = await getAPIAHRootFileData("auction/data/" + realm + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
-			String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
-			allAHData[index] = await getAPIAHRootData(ahRootDataPath);
+			try
+			{
+				AHFileRoot fileRoot = await getAPIAHRootFileData("auction/data/" + realm + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
+				String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
+				allAHData[index] = await getAPIAHRootData(ahRootDataPath);
+			}catch(Exception)
+			{
+				throw new Exception();
+			}
 		}
 
 

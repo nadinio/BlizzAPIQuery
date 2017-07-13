@@ -67,6 +67,12 @@ namespace BlizzAPIQuery
 	{
 		public List<AHRealm> realms { get; set; }
 		public List<Auction> auctions { get; set; }
+
+		public void Dispose()
+		{
+			realms = null;
+			auctions = null;
+		}
 	}
 
 
@@ -74,7 +80,6 @@ namespace BlizzAPIQuery
 	{
 		static HttpClient ahFileClient = new HttpClient();
 		static HttpClient ahDataClient = new HttpClient();
-		static AHRootObject[] allAHData = null;
 
 		public void updateAHData()
 		{
@@ -95,7 +100,7 @@ namespace BlizzAPIQuery
 			ahDataClient.Timeout = TimeSpan.FromMinutes(5);
 			
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
-						+ "Integrated Security=SSPI;";
+						+ "Integrated Security=SSPI;Max Pool Size=200;";
 
 			String[] realms;
 			int realmCount;
@@ -115,9 +120,11 @@ namespace BlizzAPIQuery
 				for (int i = 0; i < realmCount; i++)
 					if (dr.Read())
 						realms[i] = dr[0].ToString();
+
+				connection.Close();
 			}
 			
-			allAHData = new AHRootObject[realmCount];
+	
 
 			// Get all the AH data
 			try
@@ -152,7 +159,8 @@ namespace BlizzAPIQuery
 				String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
 				AHRootObject ahData = await getAPIAHRootData(ahRootDataPath);
 				insertData(ahData, realm);
-				
+				Console.WriteLine(DateTime.Now + " SUCCESS!! I've succesfully updated " + realm +"'s auction data!");
+				ahData.Dispose();
 			}catch(Exception e)
 			{
 				Console.WriteLine(DateTime.Now + " It looks like there was an error updating " + realm + ". It will attempt to update on the next data collection attempt.\n" + e.Message);
@@ -162,7 +170,7 @@ namespace BlizzAPIQuery
 		static void insertData(AHRootObject ahData, String realm)
 		{
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
-						+ "Integrated Security=SSPI;";
+						+ "Integrated Security=SSPI;Max Pool Size=200;";
 
 			Auction[] auctions = ahData.auctions.ToArray();
 
@@ -203,7 +211,7 @@ namespace BlizzAPIQuery
 
 					command.ExecuteNonQuery();
 				}
-				
+				connect.Close();
 			}
 
 		}

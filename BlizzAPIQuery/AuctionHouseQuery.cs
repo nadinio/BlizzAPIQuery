@@ -150,12 +150,12 @@ namespace BlizzAPIQuery
 			{
 				AHFileRoot fileRoot = await getAPIAHRootFileData("auction/data/" + realm + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
 				String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
-				//allAHData[index] = await getAPIAHRootData(ahRootDataPath);
 				AHRootObject ahData = await getAPIAHRootData(ahRootDataPath);
 				insertData(ahData, realm);
-			}catch(Exception)
+				
+			}catch(Exception e)
 			{
-				Console.WriteLine(DateTime.Now + " It looks like there was an error updating " + realm + ". It will attempt to update on the next data collection attempt.");
+				Console.WriteLine(DateTime.Now + " It looks like there was an error updating " + realm + ". It will attempt to update on the next data collection attempt.\n" + e.Message);
 			}
 		}
 
@@ -171,17 +171,27 @@ namespace BlizzAPIQuery
 				SqlCommand command = new SqlCommand("SELECT ConnectID FROM RealmList WHERE RealmSlug = '" + realm + "';", connect);
 				command.Connection.Open();
 				int connectID = (int)command.ExecuteScalar();
-				command = new SqlCommand("SELECT * INTO AHData_" + connectID + " FROM AHDataTemplate;", connect);
-				command.ExecuteNonQuery();
+
+				try
+				{
+					command = new SqlCommand("SELECT * INTO AHData_" + connectID + " FROM AHDataTemplate;", connect);
+					command.ExecuteNonQuery();
+				}
+				catch (Exception)
+				{
+					command = new SqlCommand("DELETE FROM AHData_" + connectID + ";", connect);
+					command.ExecuteNonQuery();
+				}
 
 				for(int i = 0; i < auctions.Length; i++)
 				{
 					String bonusLists = auctions[i].bonusLists == null ? null : "Placeholderbl";
 					String modifiers = auctions[i].modifiers == null ? null : "Placeholdermod";
+					String realmName = auctions[i].ownerRealm.Contains("'") ? auctions[i].ownerRealm.Insert(auctions[i].ownerRealm.LastIndexOf("'"), "'") : auctions[i].ownerRealm;
 
 					command = new SqlCommand("INSERT INTO AHData_" + connectID +
 						" VALUES(" + auctions[i].auc + ", " + auctions[i].item + ", '" + auctions[i].owner + "', '" + 
-						auctions[i].ownerRealm + "', " + auctions[i].bid + ", " + auctions[i].buyout + ", " +
+						realmName + "', " + auctions[i].bid + ", " + auctions[i].buyout + ", " +
 						auctions[i].quantity + ", '" + auctions[i].timeLeft + "', " + auctions[i].rand + ", " + 
 						auctions[i].seed + ", " + auctions[i].context + ", " +
 						(bonusLists == null ? "null, " : "'" + bonusLists + "', " ) + 

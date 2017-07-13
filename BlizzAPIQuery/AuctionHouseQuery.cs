@@ -92,12 +92,12 @@ namespace BlizzAPIQuery
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(10);
+			ahFileClient.Timeout = TimeSpan.FromMinutes(5);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahDataClient.Timeout = TimeSpan.FromMinutes(10);
+			ahDataClient.Timeout = TimeSpan.FromMinutes(5);
 			
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;Max Pool Size=200;";

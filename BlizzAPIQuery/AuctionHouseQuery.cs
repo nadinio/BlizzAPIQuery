@@ -67,6 +67,12 @@ namespace BlizzAPIQuery
 	{
 		public List<AHRealm> realms { get; set; }
 		public List<Auction> auctions { get; set; }
+
+		public void Dispose()
+		{
+			realms = null;
+			auctions = null;
+		}
 	}
 
 
@@ -74,7 +80,6 @@ namespace BlizzAPIQuery
 	{
 		static HttpClient ahFileClient = new HttpClient();
 		static HttpClient ahDataClient = new HttpClient();
-		static AHRootObject[] allAHData = null;
 
 		public void updateAHData()
 		{
@@ -87,15 +92,15 @@ namespace BlizzAPIQuery
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(5);
+			ahFileClient.Timeout = TimeSpan.FromMinutes(10);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahDataClient.Timeout = TimeSpan.FromMinutes(5);
+			ahDataClient.Timeout = TimeSpan.FromMinutes(10);
 			
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
-						+ "Integrated Security=SSPI;";
+						+ "Integrated Security=SSPI;Max Pool Size=200;";
 
 			String[] realms;
 			int realmCount;
@@ -115,9 +120,11 @@ namespace BlizzAPIQuery
 				for (int i = 0; i < realmCount; i++)
 					if (dr.Read())
 						realms[i] = dr[0].ToString();
+
+				connection.Close();
 			}
 			
-			allAHData = new AHRootObject[realmCount];
+	
 
 			// Get all the AH data
 			try
@@ -150,13 +157,64 @@ namespace BlizzAPIQuery
 			{
 				AHFileRoot fileRoot = await getAPIAHRootFileData("auction/data/" + realm + "?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
 				String ahRootDataPath = (fileRoot.files[0].url).Substring(55);
-				allAHData[index] = await getAPIAHRootData(ahRootDataPath);
-			}catch(Exception)
+				AHRootObject ahData = await getAPIAHRootData(ahRootDataPath);
+				insertData(ahData, realm);
+				Console.WriteLine(DateTime.Now + " SUCCESS!! I've succesfully updated " + realm +"'s auction data!");
+				ahData.Dispose();
+			}catch(Exception e)
 			{
-				Console.WriteLine(DateTime.Now + " It looks like there was an error updating " + realm + ". It will attempt to update on the next data collection attempt.");
+				Console.WriteLine(DateTime.Now + " It looks like there was an error updating " + realm + ". It will attempt to update on the next data collection attempt.\n" + e.Message);
 			}
 		}
 
+		static void insertData(AHRootObject ahData, String realm)
+		{
+			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
+						+ "Integrated Security=SSPI;Max Pool Size=200;";
+
+			Auction[] auctions = ahData.auctions.ToArray();
+
+			using (SqlConnection connect = new SqlConnection(connectionString))
+			{
+				SqlCommand command = new SqlCommand("SELECT ConnectID FROM RealmList WHERE RealmSlug = '" + realm + "';", connect);
+				command.Connection.Open();
+				int connectID = (int)command.ExecuteScalar();
+
+				try
+				{
+					command = new SqlCommand("SELECT * INTO AHData_" + connectID + " FROM AHDataTemplate;", connect);
+					command.ExecuteNonQuery();
+				}
+				catch (Exception)
+				{
+					command = new SqlCommand("DELETE FROM AHData_" + connectID + ";", connect);
+					command.ExecuteNonQuery();
+				}
+
+				for(int i = 0; i < auctions.Length; i++)
+				{
+					String bonusLists = auctions[i].bonusLists == null ? null : "Placeholderbl";
+					String modifiers = auctions[i].modifiers == null ? null : "Placeholdermod";
+					String realmName = auctions[i].ownerRealm.Contains("'") ? auctions[i].ownerRealm.Insert(auctions[i].ownerRealm.LastIndexOf("'"), "'") : auctions[i].ownerRealm;
+
+					command = new SqlCommand("INSERT INTO AHData_" + connectID +
+						" VALUES(" + auctions[i].auc + ", " + auctions[i].item + ", '" + auctions[i].owner + "', '" + 
+						realmName + "', " + auctions[i].bid + ", " + auctions[i].buyout + ", " +
+						auctions[i].quantity + ", '" + auctions[i].timeLeft + "', " + auctions[i].rand + ", " + 
+						auctions[i].seed + ", " + auctions[i].context + ", " +
+						(bonusLists == null ? "null, " : "'" + bonusLists + "', " ) + 
+						(modifiers == null ? "null, " : "'" + modifiers + "', ") + 
+						(auctions[i].petSpeciesId == null ? 0 : auctions[i].petSpeciesId) + ", " +
+						(auctions[i].petBreedId == null ? 0 : auctions[i].petBreedId) + ", " +
+						(auctions[i].petLevel == null ? 0 : auctions[i].petLevel) + ", " +
+						(auctions[i].petQualityId == null ? 0 :auctions[i].petQualityId) + ");", connect);
+
+					command.ExecuteNonQuery();
+				}
+				connect.Close();
+			}
+
+		}
 
 		static async Task<AHFileRoot> getAPIAHRootFileData(String path)
 		{

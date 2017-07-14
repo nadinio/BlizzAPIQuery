@@ -35,6 +35,7 @@ namespace BlizzAPIQuery
 
 		public void updateRealmList()
 		{
+			Console.WriteLine(DateTime.Now + " Updating realm lists...");
 			getRealmsAndInsert().Wait();
 		}
 
@@ -51,22 +52,22 @@ namespace BlizzAPIQuery
 			try
 			{
 				realms = await GetAPIRealmsAsync("realm/status?locale=en_US&apikey=k7rsncmwup6nttk6vzeg6knyw4jrjjzj");
-				Console.WriteLine("I've got the realm statuses!");
+				Console.WriteLine(DateTime.Now + " I've downloaded the realm statuses!");
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not connect to the Blizz API to update realm status!\n" + e.Message + "\n" + e.StackTrace);
+				Console.WriteLine(DateTime.Now + " Could not connect to the Blizz API to update realm status!\n" + e.Message + "\n" + e.StackTrace);
 			}
 
 			// Database Insert
 			try
 			{
 				InsertRealms(realms);
-				Console.WriteLine("Realms have been successfully updated!");
+				Console.WriteLine(DateTime.Now + " Realms have been successfully updated!\n");
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not insert realms into DB!\n" + e.Message + "\n" + e.StackTrace);
+				Console.WriteLine(DateTime.Now + " Could not insert realms into DB!\n" + e.Message);
 			}
 		}
 

@@ -86,30 +86,30 @@ namespace BlizzAPIQuery
 
 	public class AuctionHouseQuery
 	{
-		static HttpClient ahFileClient = new HttpClient();
-		static HttpClient ahDataClient = new HttpClient();
+		static HttpClient ahFileClient;
+		static HttpClient ahDataClient;
+		static String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
+			+ "Integrated Security=SSPI;Max Pool Size=200;";
 
 		public void updateAHData()
 		{
-			getAHRealmData();
-		}
-
-		static void getAHRealmData()
-		{
-			// HTTP Clients for data collection
-			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
-			ahFileClient.DefaultRequestHeaders.Accept.Clear();
-			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(10);
-		
+			ahDataClient = new HttpClient();
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			ahDataClient.Timeout = TimeSpan.FromMinutes(10);
-			
-			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
-						+ "Integrated Security=SSPI;Max Pool Size=200;";
 
+			ahFileClient = new HttpClient();
+			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
+			ahFileClient.DefaultRequestHeaders.Accept.Clear();
+			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			ahFileClient.Timeout = TimeSpan.FromMinutes(10);
+
+			getAHData();
+		}
+
+		static void getAHData()
+		{		
 			String[] realms;
 			int realmCount;
 
@@ -158,7 +158,6 @@ namespace BlizzAPIQuery
 
 		}
 
-
 		static async Task getAHDataThread(int index, String realm)
 		{
 			try
@@ -177,8 +176,7 @@ namespace BlizzAPIQuery
 
 		static void insertData(AHRootObject ahData, String realm)
 		{
-			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
-						+ "Integrated Security=SSPI;Max Pool Size=200;";
+
 
 			Auction[] auctions = ahData.auctions.ToArray();
 
@@ -238,6 +236,7 @@ namespace BlizzAPIQuery
 
 		static async Task<AHFileRoot> getAPIAHRootFileData(String path)
 		{
+
 			AHFileRoot ahFileRoot = null;
 			HttpResponseMessage response = await ahFileClient.GetAsync(path);
 
@@ -269,6 +268,4 @@ namespace BlizzAPIQuery
 		}
 
 	}
-
-
 }

@@ -35,11 +35,19 @@ namespace BlizzAPIQuery
 	{
 		public int type { get; set; }
 		public int value { get; set; }
+		public override string ToString()
+		{
+			return "{\"type\":" + type +",\"value\":"+value+"}";
+		}
 	}
 
 	public class BonusList
 	{
 		public int bonusListId { get; set; }
+		public override string ToString()
+		{
+			return "{\"bonusListId\":" + bonusListId + "}"; 
+		}
 	}
 
 	class Auction
@@ -92,12 +100,12 @@ namespace BlizzAPIQuery
 			ahFileClient.BaseAddress = new Uri("https://us.api.battle.net/wow/");
 			ahFileClient.DefaultRequestHeaders.Accept.Clear();
 			ahFileClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahFileClient.Timeout = TimeSpan.FromMinutes(5);
+			ahFileClient.Timeout = TimeSpan.FromMinutes(10);
 		
 			ahDataClient.BaseAddress = new Uri("http://auction-api-us.worldofwarcraft.com/auction-data/");
 			ahDataClient.DefaultRequestHeaders.Accept.Clear();
 			ahDataClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			ahDataClient.Timeout = TimeSpan.FromMinutes(5);
+			ahDataClient.Timeout = TimeSpan.FromMinutes(10);
 			
 			String connectionString = "Data Source=(local);Initial Catalog=RealmData;"
 						+ "Integrated Security=SSPI;Max Pool Size=200;";
@@ -193,9 +201,21 @@ namespace BlizzAPIQuery
 
 				for(int i = 0; i < auctions.Length; i++)
 				{
-					String bonusLists = auctions[i].bonusLists == null ? null : "Placeholderbl";
-					String modifiers = auctions[i].modifiers == null ? null : "Placeholdermod";
+					String bonusLists = "";
+					String modifiers = "";
 					String realmName = auctions[i].ownerRealm.Contains("'") ? auctions[i].ownerRealm.Insert(auctions[i].ownerRealm.LastIndexOf("'"), "'") : auctions[i].ownerRealm;
+
+					if (auctions[i].bonusLists == null)
+						bonusLists = null;
+					else
+						for (int j = 0; j < auctions[i].bonusLists.Count; j++)
+							bonusLists += j == auctions[i].bonusLists.Count - 1 ? auctions[i].bonusLists[j].ToString() : auctions[i].bonusLists[j].ToString() + ",";
+
+					if (auctions[i].modifiers == null)
+						modifiers = null;
+					else
+						for (int j = 0; j < auctions[i].modifiers.Count; j++)
+							modifiers += j == auctions[i].modifiers.Count - 1 ? auctions[i].modifiers[j].ToString() : auctions[i].modifiers[j].ToString() + ",";
 
 					command = new SqlCommand("INSERT INTO AHData_" + connectID +
 						" VALUES(" + auctions[i].auc + ", " + auctions[i].item + ", '" + auctions[i].owner + "', '" + 

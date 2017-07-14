@@ -6,9 +6,12 @@ namespace BlizzAPIQuery
 	{
 		static void Main(string[] args)
 		{
-			while (true)
+			Boolean exit = false;
+			while (!exit)
 			{
-				Console.WriteLine("Commmands: \nrl \t\t Update the realmlist.\nahupdate \t Downloads and updates all AH data.");
+				Console.WriteLine("Commmands: \nrl \t\t Update the realmlist.\nahupdate \t Downloads and updates all AH data." + 
+					"\nexit \t\tExits the application");
+
 				String userInput = Console.ReadLine();
 				switch(userInput)
 				{
@@ -20,24 +23,15 @@ namespace BlizzAPIQuery
 						AuctionHouseQuery ahData = new AuctionHouseQuery();
 						ahData.updateAHData();
 						break;
+					case "exit":
+						exit = true;
+						break;
 					default:
 						Console.WriteLine("Invalid command.");
 						break;
 
 				}
 			}
-
-			/*
-			RealmListQuery realmList = new RealmListQuery();
-			realmList.updateRealmList();
-			
-
-			AuctionHouseQuery ahData = new AuctionHouseQuery();
-			ahData.updateAHData();
-			*/
-
-
-
 		}	
 	}
 }

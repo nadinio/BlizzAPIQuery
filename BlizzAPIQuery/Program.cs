@@ -6,14 +6,29 @@ namespace BlizzAPIQuery
 	{
 		static void Main(string[] args)
 		{
+			if (args.Length == 0)
+				action(null);
+			else
+				action(args[0]);
+		}
+		
+		static void action(String action)
+		{
 			Boolean exit = false;
 			while (!exit)
 			{
-				Console.WriteLine("Commmands: \nrl \t\t Update the realmlist.\nahupdate \t Downloads and updates all AH data." + 
+				Console.WriteLine("Commmands: \nrl \t\t Update the realmlist.\nahupdate \t Downloads and updates all AH data." +
 					"\nexit \t\tExits the application");
 
-				String userInput = Console.ReadLine();
-				switch(userInput)
+				String userInput;
+
+				if (action == null)
+					userInput = Console.ReadLine();
+				else
+					userInput = action;	
+
+				
+				switch (userInput)
 				{
 					case "rl":
 						RealmListQuery realmList = new RealmListQuery();
@@ -29,9 +44,11 @@ namespace BlizzAPIQuery
 					default:
 						Console.WriteLine("Invalid command.");
 						break;
-
 				}
+
+				if (action != null)
+					break;
 			}
-		}	
+		}
 	}
 }

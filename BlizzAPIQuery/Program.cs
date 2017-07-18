@@ -18,7 +18,7 @@ namespace BlizzAPIQuery
 			while (!exit)
 			{
 				Console.WriteLine("Commmands: \nrl \t\t Update the realmlist.\nahupdate \t Downloads and updates all AH data." +
-					"\nexit \t\tExits the application");
+					"\nilupdate \tUpdates item list.\nexit \t\tExits the application");
 
 				String userInput;
 
@@ -37,6 +37,10 @@ namespace BlizzAPIQuery
 					case "ahupdate":
 						AuctionHouseQuery ahData = new AuctionHouseQuery();
 						ahData.updateAHData();
+						break;
+					case "ilupdate":
+						ItemListQuery ilQuery = new ItemListQuery();
+						ilQuery.getItemInfoFromRealm("stormrage"); // Stormrage for testing
 						break;
 					case "exit":
 						exit = true;

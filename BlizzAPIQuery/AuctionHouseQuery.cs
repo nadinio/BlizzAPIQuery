@@ -159,7 +159,6 @@ namespace BlizzAPIQuery
 				Task.WaitAll(ahTaskArray2);
 
 				Console.WriteLine(DateTime.Now + " I've updated the AH data!");
-				writeUpdateTime();
 			}
 			catch (Exception e)
 			{
@@ -242,19 +241,6 @@ namespace BlizzAPIQuery
 				connect.Close();
 			}
 
-		}
-
-		static void writeUpdateTime()
-		{
-			try
-			{
-				System.IO.File.WriteAllText(@"LastUpdateTime.txt", "Last Update: " + DateTime.Now);
-			}
-			catch(Exception)
-			{
-				System.IO.File.Delete(@"LastUpdateTime.txt");
-				System.IO.File.WriteAllText(@"LastUpdateTime.txt", "Last Update: " + DateTime.Now);
-			}
 		}
 
 		static async Task<AHFileRoot> getAPIAHRootFileData(String path)

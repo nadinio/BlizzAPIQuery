@@ -14,3 +14,4 @@ C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\Newtonsoft.Jso
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.csprojResolveAssemblyReference.cache
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.exe
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.pdb
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.csproj.CoreCompileInputs.cache

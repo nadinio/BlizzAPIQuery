@@ -139,15 +139,24 @@ namespace BlizzAPIQuery
 			{
 				Console.WriteLine(DateTime.Now + " I'm attempting to get all the AH data. This could take a while...");
 
-				Task[] ahTaskArray = new Task[realmCount];
+				Task[] ahTaskArray1 = new Task[realmCount/ 2];
+				Task[] ahTaskArray2 = new Task[realmCount / 2];
 
-				for(int i = 0; i < realmCount; i++)
+				for(int i = 0; i < ahTaskArray1.Length; i++)
 				{
 					int x = i;
-					ahTaskArray[i] = Task.Run(async () => await getAHDataThread(x, realms[x]));
+					ahTaskArray1[i] = Task.Run(async () => await getAHDataThread(realms[x]));
 				}
 
-				Task.WaitAll(ahTaskArray);
+				Task.WaitAll(ahTaskArray1);
+
+				for (int i = 0; i < ahTaskArray2.Length; i++)
+				{
+					int x = i + ahTaskArray1.Length;
+					ahTaskArray2[i] = Task.Run(async () => await getAHDataThread(realms[x]));
+				}
+
+				Task.WaitAll(ahTaskArray2);
 
 				Console.WriteLine(DateTime.Now + " I've updated the AH data!");
 				writeUpdateTime();
@@ -159,7 +168,7 @@ namespace BlizzAPIQuery
 
 		}
 
-		static async Task getAHDataThread(int index, String realm)
+		static async Task getAHDataThread(String realm)
 		{
 			try
 			{

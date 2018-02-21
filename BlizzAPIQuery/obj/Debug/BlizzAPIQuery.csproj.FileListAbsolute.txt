@@ -15,3 +15,7 @@ C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.exe
 C:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.pdb
 D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\obj\Debug\BlizzAPIQuery.csproj.CoreCompileInputs.cache
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\EntityFramework.dll
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\EntityFramework.SqlServer.dll
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\EntityFramework.xml
+D:\Users\Nicholas\Workspace\BlizzAPIQuery\BlizzAPIQuery\bin\Debug\EntityFramework.SqlServer.xml

@@ -85,13 +85,14 @@ namespace BlizzAPIQuery
 						db.realms.Add(r);
 						//db.connectedRealms.Add(r.connected_realms);
 					}
-					db.SaveChanges();
+                    db.SaveChanges();
+                   
 				}
 				Console.WriteLine(DateTime.Now + " Realms have been successfully updated!\n");
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(DateTime.Now + " Could not insert realms into DB!\n" + e.Message);
+				Console.WriteLine(DateTime.Now + " Could not insert realms into DB!\n" + e.Message + "\n" + e.StackTrace);
 			}
 		}
 

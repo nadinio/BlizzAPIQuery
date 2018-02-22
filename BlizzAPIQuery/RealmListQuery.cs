@@ -26,6 +26,7 @@ namespace BlizzAPIQuery
 		public string locale { get; set; }
 		public string timezone { get; set; }
 		public virtual List<string> connected_realms { get; set; }
+
 		/*public string connected_realmsString
 		{
 			get { return string.Join(",", connected_realms); }
